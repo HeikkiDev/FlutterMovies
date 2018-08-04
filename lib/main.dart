@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app_ejemplo1/detail.dart';
+import 'package:flutter_app_ejemplo1/models/movie.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert'; //json
 import 'dart:async'; // timer
@@ -13,9 +15,10 @@ class MyApp extends StatelessWidget {
     return new MaterialApp(
       title: 'Flutter Movies Demo',
       theme: new ThemeData(
-        primarySwatch: Colors.red,
+        primarySwatch: Colors.blue,
+        accentColor: Colors.blueAccent
       ),
-      home: new MoviesPage(),
+      home: new MoviesPage()
     );
   }
 }
@@ -30,7 +33,7 @@ class MoviesPage extends StatefulWidget {
 
 // Home page state class
 class _MoviesPageState extends State<MoviesPage> {
-  List movies = [];
+  List<Movie> movies = [];
 
   @override
   void initState() {
@@ -65,9 +68,21 @@ class _MoviesPageState extends State<MoviesPage> {
 
   // Crea y devuelve un 'Label' con el título de la peli correspondiente
   Widget getRow(int i) {
-    return new Padding(
-        padding: new EdgeInsets.all(10.0),
-        child: new Text("${movies[i]["title"]}")
+    return new GestureDetector(
+      child: new Padding(
+          padding: new EdgeInsets.all(10.0),
+          child: new Text("${movies[i].title}")
+      ),
+      onTap: () {
+        // Abrir página de detalle de la película
+        var movie = new Movie(movies[i].title, movies[i].overview, movies[i].poster_path);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => MovieDetailPage(movie: movie)
+          )
+        );
+      }
     );
   }
 
@@ -76,9 +91,10 @@ class _MoviesPageState extends State<MoviesPage> {
     http.Response response = await http.get(dataURL);
     var responseJson = json.decode(response.body);
     // Simular carga de 5 segundos para que se muestre el loading indicator
-    Timer timer = new Timer(new Duration(seconds: 5), () {
+    Timer timer = new Timer(new Duration(seconds: 2), () {
       setState(() {
-        movies = responseJson['results'] as List;
+        // Deserializa result (que es la lista de pelis) en una List de Movie
+        movies =  (responseJson['results'] as List).map((p) => Movie.fromJson(p)).toList();
       });
     });
   }
