@@ -75,11 +75,10 @@ class _MoviesPageState extends State<MoviesPage> {
       ),
       onTap: () {
         // Abrir página de detalle de la película
-        var movie = new Movie(movies[i].title, movies[i].overview, movies[i].poster_path);
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => MovieDetailPage(movie: movie)
+            builder: (context) => MovieDetailPage(movie: movies[i])
           )
         );
       }
